@@ -1,9 +1,7 @@
 <?php
-
 /*
 povezava na streznik
 */
-
 $host='localhost';
 $user='root';
 $password='root';
