@@ -7,9 +7,8 @@ body{
 }
 
 #predvajalnik{
-        background-color:dimgray;
-        margin-left:300px;
-        margin-right:300px;
+        margin-left:390px;
+        margin-right:150px;
         size:80%;
         outline:1px solid gray;
         padding:20px;
@@ -17,4 +16,17 @@ body{
         background-position:top right;
         background-repeat: no-repeat;
         border-radius:10px;
+}
+
+#meni{
+    background-color:white;
+    margin-left:5px;
+    margin-right:900px;
+    size:80%;
+    outline:1px solid gray;
+    padding:20px;
+    background-color:floralwhite;
+    background-position:top right;
+    background-repeat: no-repeat;
+    border-radius:10px;
 }
