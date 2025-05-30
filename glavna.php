@@ -9,17 +9,25 @@
     <title>Music player</title>
 </head>
 <body>
-<section id="predvajalnik">
-    <audio controls>
-        <source src="" type="audio">
-        <source src="" type="audio/">
-    </audio>
-</section>
 
-<section id="meni">
-test test test
-</section>
+<div id="vsebina">
+    <section id="meni">
+        <h1>Seznam pesem</h1>
+        <ol>
+            <li><a href="pesmi/pesem1">Test</a></li>
+        </ol>
+    </section>
+
+    <section id="predvajalnik">
+        <h1>Pesem 1</h1>
+        <h3>Avtor: </h3>
+        <h3>Izdano: </h3>
+        <audio controls>
+            <source src="pesmi/mesanomeso.mp3" type="audio/mpeg">
+            Vaš brskalnik ne podpira predvajalca pesmi.
+        </audio>
+    </section>
+</div>
 
 </body>
 </html>
-

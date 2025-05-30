@@ -44,8 +44,9 @@ body{
     width: 130px;
     cursor: pointer;
     font-weight:bold;
-    float:right;
     color:black;
+    float:right;
+    clear: both;
 
 }
 #registergumb:hover{
