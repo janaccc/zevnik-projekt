@@ -6,19 +6,20 @@
     <link rel="stylesheet" type="text/css" href="index.css"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registriraj kot nov uporabnik</title>
+    <title>Prijava v aplikacijo</title>
 </head>
 <body>
 <section id="section">
-    <h1>Registracija</h1>
+    <h1>Prijava</h1>
     <p id="prvi">
-        Vnesi podatke
+        Za uporabo aplikacije je potrebna prijava.
     </p>
     <form action="" method="POST">
-        Uporabniško ime: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
-        Geslo: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
+        E-mail: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi e-pošto"><br>
+        Password: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
         <div>
-            <input type="submit" name="registracija" value="Registracija" id="posljigumb">
+            <input type="submit" name="registergumb" value="Registracija" id="posljigumb">
+            <a href="prijava.php"><button type="button" id="registergumb">Nazaj na prijavo?</button></a>
         </div>
     </form>
 </section>
