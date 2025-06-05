@@ -15,8 +15,8 @@
         Za uporabo aplikacije je potrebna prijava.
     </p>
     <form action="" method="POST">
-        E-mail: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi e-pošto"><br>
-        Password: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
+        Uporabniško ime: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
+        Geslo: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
         <div>
             <input type="submit" name="prijava" value="Prijava" id="posljigumb">
             <a href="registracija.php"><button type="button" id="registergumb">Registracija</button></a>
