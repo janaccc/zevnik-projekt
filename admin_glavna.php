@@ -1,11 +1,19 @@
 <?php
-require_once 'session.php'; // session_start() mora biti tukaj
+require_once 'session.php'; // vsebuje session_start()
 
+// Če uporabnik ni prijavljen, najprej preusmerimo na prijavo
 if (!isset($_SESSION['user'])) {
-    // Če uporabnik ni prijavljen, ga preusmeri na prijavo
     header("Location: prijava.php");
     exit;
 }
+
+// Če je prijavljen, a ni admin, ga preusmerimo na glavno
+if ($_SESSION['vloga'] !== 'admin') {
+    header("Location: glavna.php");
+    exit;
+}
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="sl">
@@ -16,7 +24,10 @@ if (!isset($_SESSION['user'])) {
     <title>Music player</title>
 </head>
 <body>
-    <h1>ADMIN STRAN</h1>
+
+<div id="edit">
+<h1><a id="adminpanel" href="admin_panel.php">ADMIN PANEL</a></h1>
+</div>
 
 <div id="vsebina">
     <section id="meni">

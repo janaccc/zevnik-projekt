@@ -50,3 +50,16 @@ body {
     clear: both;
     margin-top: 20px;
 }
+
+#edit{
+    float:right;
+    margin-right: 50px;
+    background-color:yellow;
+    outline: 1px solid gray;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#adminpanel{
+    text-decoration: none;
+}
