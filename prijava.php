@@ -2,9 +2,13 @@
 require_once 'povezava.php'; // vsebuje $conn
 require_once 'session.php';  // vsebuje session_start()
 
-// Če je uporabnik že prijavljen, ga preusmeri na glavna.php
-if (isset($_SESSION['user'])) {
-    header("Location: glavna.php");
+// Če je uporabnik že prijavljen, ga preusmeri glede na vlogo
+if (isset($_SESSION['user']) && isset($_SESSION['vloga'])) {
+    if ($_SESSION['vloga'] === 'admin') {
+        header("Location: admin.php");
+    } else {
+        header("Location: glavna.php");
+    }
     exit;
 }
 
@@ -17,19 +21,25 @@ if (isset($_POST['prijava'])) {
     if (empty($uporabnisko_ime) || empty($geslo)) {
         $napaka = "Vnesite uporabniško ime in geslo.";
     } else {
-        $stmt = mysqli_prepare($conn, "SELECT id, password FROM uporabniki WHERE user = ?");
+        $stmt = mysqli_prepare($conn, "SELECT id, password, vloga FROM uporabniki WHERE user = ?");
         mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_store_result($stmt);
 
         if (mysqli_stmt_num_rows($stmt) === 1) {
-            mysqli_stmt_bind_result($stmt, $id, $hashed_password);
+            mysqli_stmt_bind_result($stmt, $id, $hashed_password, $vloga);
             mysqli_stmt_fetch($stmt);
 
             if (password_verify($geslo, $hashed_password)) {
                 $_SESSION['id'] = $id;
                 $_SESSION['user'] = $uporabnisko_ime;
-                header("Location: glavna.php");
+                $_SESSION['vloga'] = $vloga;
+
+                if ($vloga === 'admin') {
+                    header("Location: admin_glavna.php");
+                } else {
+                    header("Location: glavna.php");
+                }
                 exit;
             } else {
                 $napaka = "Napačno geslo.";
@@ -62,8 +72,8 @@ if (isset($_POST['prijava'])) {
         Za uporabo aplikacije je potrebna prijava.
     </p>
     <form action="" method="POST">
-        Uporabniško ime: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
-        Geslo: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
+        Uporabniško ime: <input type="text" name="naziv" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
+        Geslo: <input type="password" name="tip" required class="vnos" placeholder="Vnesi geslo"><br>
         <div>
             <input type="submit" name="prijava" value="Prijava" id="posljigumb">
             <a href="registracija.php"><button type="button" id="registergumb">Registracija</button></a>
