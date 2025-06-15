@@ -19,16 +19,34 @@ body {
 #meni, #predvajalnik {
     outline: 1px solid gray;
     padding: 20px;
-    background-color: floralwhite;
     background-repeat: no-repeat;
     background-position: top right;
     border-radius: 10px;
 }
 
+#predvajalnik{
+    background-image: url(slike/ozadje-slika.jpg);
+    background-size: cover;
+}
+
 #meni {
     width: 300px;
+    background-color: floralwhite;
+}
+
+#meniH1{
+    float:left;
 }
 
 #predvajalnik {
     width: 700px;
+}
+
+#odjava{
+    float:right;
+}
+
+#pesmi{
+    clear: both;
+    margin-top: 20px;
 }
