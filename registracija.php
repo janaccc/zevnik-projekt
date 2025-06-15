@@ -1,4 +1,48 @@
 <?php
+require_once 'povezava.php';
+session_start();
+
+$napaka = '';
+$uspeh = '';
+
+try {
+    if (isset($_POST['registergumb'])) {
+        $uporabnisko_ime = trim($_POST['naziv']);
+        $geslo = $_POST['tip'];
+
+        if (empty($uporabnisko_ime) || empty($geslo)) {
+            $napaka = "Vsa polja so obvezna.";
+        } else {
+            // Preverimo, če uporabnik že obstaja
+            $stmt = mysqli_prepare($conn, "SELECT id FROM uporabniki WHERE user = ?");
+            mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_store_result($stmt);
+
+            if (mysqli_stmt_num_rows($stmt) > 0) {
+                $napaka = "Uporabniško ime je že zasedeno.";
+            } else {
+                // Hash gesla
+                $hashed_password = password_hash($geslo, PASSWORD_DEFAULT);
+
+                // Vnos novega uporabnika
+                $stmt = mysqli_prepare($conn, "INSERT INTO uporabniki (user, password) VALUES (?, ?)");
+                mysqli_stmt_bind_param($stmt, "ss", $uporabnisko_ime, $hashed_password);
+
+                if (mysqli_stmt_execute($stmt)) {
+                    $uspeh = "Registracija uspešna! Preusmerjam na prijavo...";
+                    header("Refresh: 3; URL=prijava.php");
+                } else {
+                    $napaka = "Napaka pri vnosu v bazo.";
+                }
+            }
+
+            mysqli_stmt_close($stmt);
+        }
+    }
+} catch (Exception $e) {
+    $napaka = "Napaka: " . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="sl">
@@ -11,12 +55,21 @@
 <body>
 <section id="section">
     <h1>Registracija</h1>
+
+    <?php if (!empty($napaka)): ?>
+        <div style="color: red;"><?= htmlspecialchars($napaka) ?></div>
+    <?php endif; ?>
+
+    <?php if (!empty($uspeh)): ?>
+        <div style="color: green;"><?= htmlspecialchars($uspeh) ?></div>
+    <?php endif; ?>
+
     <p id="prvi">
         Vnesite podatke za registracijo.
     </p>
     <form action="" method="POST">
-        Uporabniško ime: <input type="text" name="naziv" value="" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
-        Geslo: <input type="password" name="tip" value="" required class="vnos" placeholder="Vnesi geslo"><br>
+        <b>Uporabniško ime:</b> <input type="text" name="naziv" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
+        <b>Geslo:</b> <input type="password" name="tip" required class="vnos" placeholder="Vnesi geslo"><br>
         <div>
             <input type="submit" name="registergumb" value="Registracija" id="posljigumb">
             <a href="prijava.php"><button type="button" id="registergumb">Nazaj na prijavo?</button></a>
@@ -25,4 +78,3 @@
 </section>
 </body>
 </html>
-
