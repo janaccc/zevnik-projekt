@@ -1,5 +1,5 @@
 <?php
-require_once 'session.php'; // session_start() mora biti tukaj
+require_once 'session.php';
 
 if (!isset($_SESSION['user'])) {
     // Če uporabnik ni prijavljen, ga preusmeri na prijavo
