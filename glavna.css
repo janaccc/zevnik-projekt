@@ -65,15 +65,25 @@ body {
 }
 
 #dodaj_pesem{
+    background-color: floralwhite;
     outline: 1px solid gray;
     padding: 20px;
-    background-repeat: no-repeat;
-    background-position: top right;
     border-radius: 10px;
+    width: 700px;
+    margin:0 auto;
 }
 
 #uredi_pesem {
     background-color: floralwhite;
+    outline: 1px solid gray;
+    padding: 20px;
+    border-radius: 10px;
+    width: 700px;
+    margin:0 auto;
+}
+
+#dodaj_izvajalca{
+        background-color: floralwhite;
     outline: 1px solid gray;
     padding: 20px;
     border-radius: 10px;

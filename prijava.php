@@ -5,7 +5,7 @@ require_once 'session.php';  // vsebuje session_start()
 // Če je uporabnik že prijavljen, ga preusmeri glede na vlogo
 if (isset($_SESSION['user']) && isset($_SESSION['vloga'])) {
     if ($_SESSION['vloga'] === 'admin') {
-        header("Location: admin.php");
+        header("Location: admin_glavna.php");
     } else {
         header("Location: glavna.php");
     }
