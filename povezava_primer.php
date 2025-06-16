@@ -1,5 +1,4 @@
 <?php
-More actions
 /*
 povezava na streznik
 */

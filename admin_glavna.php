@@ -83,15 +83,18 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
     <section id="meni">
         <h1 id="meniH1">Meni</h1>
         <h2 id="odjava"><a href="odjava.php">Odjava</a></h2>
-        <ol id="pesmi">
-            <?php foreach ($pesmi as $pesem): ?>
-                <li>
-                    <a href="admin_glavna.php?id=<?= $pesem['pesem_id'] ?>">
-                        <?= htmlspecialchars($pesem['pesem_naslov']) ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ol>
+<ol id="pesmi">
+    <?php foreach ($pesmi as $pesem): ?>
+        <li>
+            <a href="admin_glavna.php?id=<?= $pesem['pesem_id'] ?>">
+                <?= htmlspecialchars($pesem['pesem_naslov']) ?>
+            </a>
+            <a href="uredi_pesem.php?id=<?= $pesem['pesem_id'] ?>" style="margin-left: 10px;">
+                <button>Uredi</button>
+            </a>
+        </li>
+    <?php endforeach; ?>
+</ol>
     </section>
 
     <section id="predvajalnik">

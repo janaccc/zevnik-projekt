@@ -10,49 +10,44 @@ require_once 'session.php';
 $napaka = '';
 $uspeh = '';
 
-try {
-    if (isset($_POST['registergumb'])) {
-        $uporabnisko_ime = trim($_POST['uporabnisko_ime']);
-$geslo = $_POST['geslo'];
+if (isset($_POST['registergumb'])) {
+    $uporabnisko_ime = trim($_POST['uporabnisko_ime']);
+    $geslo = $_POST['geslo'];
 
-        if (empty($uporabnisko_ime) || empty($geslo)) {
-            $napaka = "Vsa polja so obvezna.";
+    if (empty($uporabnisko_ime) || empty($geslo)) {
+        $napaka = "Vsa polja so obvezna.";
+    } else {
+        // Preverimo, če uporabnik že obstaja
+        $stmt = mysqli_prepare($conn, "SELECT id FROM uporabniki WHERE user = ?");
+        mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_store_result($stmt);
+
+        if (mysqli_stmt_num_rows($stmt) > 0) {
+            $napaka = "Uporabniško ime je že zasedeno.";
         } else {
-            // Preverimo, če uporabnik že obstaja
-            $stmt = mysqli_prepare($conn, "SELECT id FROM uporabniki WHERE user = ?");
-            mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_store_result($stmt);
+            // Hash gesla
+            $hashed_password = password_hash($geslo, PASSWORD_DEFAULT);
 
-            if (mysqli_stmt_num_rows($stmt) > 0) {
-                $napaka = "Uporabniško ime je že zasedeno.";
+            // Vnos novega uporabnika
+            $stmt_insert = mysqli_prepare($conn, "INSERT INTO uporabniki (user, password) VALUES (?, ?)");
+            mysqli_stmt_bind_param($stmt_insert, "ss", $uporabnisko_ime, $hashed_password);
+
+            if (mysqli_stmt_execute($stmt_insert)) {
+                $uspeh = "Registracija uspešna. Preusmerjam na prijavo...";
+                header("Refresh: 3; URL=prijava.php");
             } else {
-                // Hash gesla
-                $hashed_password = password_hash($geslo, PASSWORD_DEFAULT);
-
-                // Vnos novega uporabnika
-                $stmt = mysqli_prepare($conn, "INSERT INTO uporabniki (user, password) VALUES (?, ?)");
-                mysqli_stmt_bind_param($stmt, "ss", $uporabnisko_ime, $hashed_password);
-
-                if (mysqli_stmt_execute($stmt)) {
-                    header("Refresh: 3; URL=prijava.php");
-                    $uspeh = "Registracija uspešna.";
-                } else {
-                    $napaka = "Napaka pri vnosu v bazo.";
-                }
+                $napaka = "Napaka pri vnosu v bazo.";
             }
-
-            mysqli_stmt_close($stmt);
+            mysqli_stmt_close($stmt_insert);
         }
+
+        mysqli_stmt_close($stmt);
     }
-// Nekaj dela, npr. priprava stavka
-$stmt = mysqli_prepare($conn, "SELECT ...");
-if (!$stmt) {
-    $napaka = "Napaka pri pripravi poizvedbe: " . mysqli_error($conn);
-} else {
-    // nadaljuj z izvajanjem
-}
+} // <-- tukaj manjka zaključni oklepaj
+
 ?>
+
 <!DOCTYPE html>
 <html lang="sl">
 <head>
@@ -65,15 +60,13 @@ if (!$stmt) {
 <section id="section">
     <h1>Registracija</h1>
 
-<?php
-if (!empty($napaka)) { //izpise njiz napake oz uspeha
-    echo '<div style="color: red;">' . htmlspecialchars($napaka) . '</div>';
-}
+    <?php if (!empty($napaka)): ?>
+        <div style="color: red;"><?= htmlspecialchars($napaka) ?></div>
+    <?php endif; ?>
 
-if (!empty($uspeh)) {
-    echo '<div style="color: green;">' . htmlspecialchars($uspeh) . '</div>';
-};
-?>
+    <?php if (!empty($uspeh)): ?>
+        <div style="color: green;"><?= htmlspecialchars($uspeh) ?></div>
+    <?php endif; ?>
 
     <p id="prvi">
         Vnesite podatke za registracijo.

@@ -2,9 +2,13 @@
 require_once 'session.php';
 require_once 'povezava.php';
 
-// Dovoljen dostop samo za prijavljene
+// Preveri prijavo in vlogo
 if (!isset($_SESSION['user'])) {
     header("Location: prijava.php");
+    exit;
+}
+if ($_SESSION['vloga'] !== 'admin') {
+    header("Location: glavna.php");
     exit;
 }
 
