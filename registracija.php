@@ -5,7 +5,7 @@ if (!$conn) {
     die("Napaka pri povezavi z bazo: " . mysqli_connect_error());
 }
 
-session_start();
+require_once 'session.php';
 
 $napaka = '';
 $uspeh = '';
@@ -36,6 +36,7 @@ $geslo = $_POST['geslo'];
 
                 if (mysqli_stmt_execute($stmt)) {
                     header("Refresh: 3; URL=prijava.php");
+                    $uspeh = "Registracija uspešna.";
                 } else {
                     $napaka = "Napaka pri vnosu v bazo.";
                 }
@@ -44,8 +45,12 @@ $geslo = $_POST['geslo'];
             mysqli_stmt_close($stmt);
         }
     }
-} catch (Exception $e) {
-    $napaka = "Napaka: " . $e->getMessage();
+// Nekaj dela, npr. priprava stavka
+$stmt = mysqli_prepare($conn, "SELECT ...");
+if (!$stmt) {
+    $napaka = "Napaka pri pripravi poizvedbe: " . mysqli_error($conn);
+} else {
+    // nadaljuj z izvajanjem
 }
 ?>
 <!DOCTYPE html>
@@ -60,13 +65,15 @@ $geslo = $_POST['geslo'];
 <section id="section">
     <h1>Registracija</h1>
 
-    <?php if (!empty($napaka)): ?>
-        <div style="color: red;"><?= htmlspecialchars($napaka) ?></div>
-    <?php endif; ?>
+<?php
+if (!empty($napaka)) { //izpise njiz napake oz uspeha
+    echo '<div style="color: red;">' . htmlspecialchars($napaka) . '</div>';
+}
 
-    <?php if (!empty($uspeh)): ?>
-        <div style="color: green;"><?= htmlspecialchars($uspeh) ?></div>
-    <?php endif; ?>
+if (!empty($uspeh)) {
+    echo '<div style="color: green;">' . htmlspecialchars($uspeh) . '</div>';
+};
+?>
 
     <p id="prvi">
         Vnesite podatke za registracijo.

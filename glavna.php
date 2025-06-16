@@ -1,10 +1,33 @@
 <?php
 require_once 'session.php';
+require_once 'povezava.php'; // $conn
 
 if (!isset($_SESSION['user'])) {
-    // Če uporabnik ni prijavljen, ga preusmeri na prijavo
     header("Location: prijava.php");
     exit;
+}
+
+$pesmi = [];
+$trenutna_pesem = null;
+
+// Pridobi pesmi iz baze
+$sql = "SELECT * FROM pesmi ORDER BY title ASC";
+$result = mysqli_query($conn, $sql);
+
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $pesmi[] = $row;
+    }
+
+    // Če ni bila podana ID pesmi, vzamemo prvo
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : $pesmi[0]['id'];
+
+    foreach ($pesmi as $p) {
+        if ($p['id'] == $id) {
+            $trenutna_pesem = $p;
+            break;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -22,18 +45,23 @@ if (!isset($_SESSION['user'])) {
         <h1 id="meniH1">Meni</h1>
         <h2 id="odjava"><a href="odjava.php">Odjava</a></h2>
         <ol id="pesmi">
-            <li><a href="pesmi/pesem1">Test</a></li>
+            <?php foreach ($pesmi as $pesem): ?>
+                <li><a href="predvajalnik.php?id=<?= $pesem['id'] ?>"><?= htmlspecialchars($pesem['title']) ?></a></li>
+            <?php endforeach; ?>
         </ol>
     </section>
 
     <section id="predvajalnik">
-        <h1>Pesem 1</h1>
-        <h3>Avtor: </h3>
-        <h3>Izdano: </h3>
-        <audio controls>
-            <source src="pesmi/mesanomeso.mp3" type="audio/mpeg">
-            Vaš brskalnik ne podpira predvajalca pesmi.
-        </audio>
+        <?php if ($trenutna_pesem): ?>
+            <h1><?= htmlspecialchars($trenutna_pesem['title']) ?></h1>
+            <h3>Opis: <?= htmlspecialchars($trenutna_pesem['description']) ?></h3>
+            <audio controls>
+                <source src="<?= htmlspecialchars($trenutna_pesem['audio_path']) ?>" type="audio/mpeg">
+                Vaš brskalnik ne podpira predvajalnika.
+            </audio>
+        <?php else: ?>
+            <p>Ni pesmi za prikaz.</p>
+        <?php endif; ?>
     </section>
 </div>
 
