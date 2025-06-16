@@ -103,14 +103,14 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
             <p><strong>Dolžina:</strong> <?= htmlspecialchars($trenutna_pesem['Dolzina']) ?></p>
             <p><strong>Izvajalci:</strong> <?= implode(", ", getIzvajalciZaPesem($conn, $trenutna_pesem['pesem_id'])) ?></p>
 
-            <?php if (!empty($trenutna_pesem['slika_path'])): ?>
-                <img src="<?= htmlspecialchars($trenutna_pesem['slika_path']) ?>" alt="Slika pesmi" style="max-width: 300px; margin-top: 10px; margin-bottom: 20px;">
+            <?php if (!empty($trenutna_pesem['pot_do_slike'])): ?>
+                <img src="<?= htmlspecialchars($trenutna_pesem['pot_do_slike']) ?>" alt="Slika pesmi" style="max-width: 300px; margin-top: 10px; margin-bottom: 20px;">
             <?php endif; ?>
 
-            <?php if (!empty($trenutna_pesem['audio_path'])): ?>
+            <?php if (!empty($trenutna_pesem['pod_do_pesmi'])): ?>
                 <h3>Predvajaj:</h3>
                 <audio controls style="width: 100%; max-width: 600px;">
-                    <source src="<?= htmlspecialchars($trenutna_pesem['audio_path']) ?>" type="audio/mpeg">
+                    <source src="<?= htmlspecialchars($trenutna_pesem['pod_do_pesmi']) ?>" type="audio/mpeg">
                     Vaš brskalnik ne podpira predvajalnika zvoka.
                 </audio>
             <?php else: ?>
