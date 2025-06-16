@@ -12,48 +12,59 @@ if ($_SESSION['vloga'] !== 'admin') {
     exit;
 }
 
+// Pridobi seznam izvajalcev
+$izvajalci = [];
+$res = mysqli_query($conn, "SELECT id, Ime FROM Izvajalci ORDER BY Ime ASC");
+while ($row = mysqli_fetch_assoc($res)) {
+    $izvajalci[] = $row;
+}
+
+// Pridobi seznam žanrov
+$zanri = [];
+$res_zanri = mysqli_query($conn, "SELECT id, Ime FROM zanri ORDER BY Ime ASC");
+while ($row = mysqli_fetch_assoc($res_zanri)) {
+    $zanri[] = $row;
+}
+
 // Obdelava obrazca
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ime = $_POST['ime'] ?? '';
     $leto = $_POST['leto_izdaje'] ?? '';
     $dolzina = $_POST['dolzina'] ?? '';
     $izvajalec_id = (int)($_POST['izvajalec'] ?? 0);
+    $zanr_id = (int)($_POST['zanr'] ?? 0);
 
-$audio_path = '';
-if (isset($_FILES['mp3']) && $_FILES['mp3']['error'] === 0) {
-    if (!is_dir('pesmi')) {
-        mkdir('pesmi', 0777, true);
+    $audio_path = '';
+    if (isset($_FILES['mp3']) && $_FILES['mp3']['error'] === 0) {
+        if (!is_dir('pesmi')) {
+            mkdir('pesmi', 0777, true);
+        }
+        $filename = basename($_FILES['mp3']['name']);
+        $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
+        $audio_path = 'pesmi/' . $filename;
+        move_uploaded_file($_FILES['mp3']['tmp_name'], $audio_path);
     }
-    $filename = basename($_FILES['mp3']['name']);
-    // Lahko dodamo sanacijo imena, npr. odstranjevanje presledkov:
-    $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
-    $audio_path = 'pesmi/' . $filename;
-    move_uploaded_file($_FILES['mp3']['tmp_name'], $audio_path);
-}
 
-// Naloži sliko
-$slika_path = '';
-if (isset($_FILES['slika']) && $_FILES['slika']['error'] === 0) {
-    if (!is_dir('slike_pesmi')) {
-        mkdir('slike_pesmi', 0777, true);
+    $slika_path = '';
+    if (isset($_FILES['slika']) && $_FILES['slika']['error'] === 0) {
+        if (!is_dir('slike_pesmi')) {
+            mkdir('slike_pesmi', 0777, true);
+        }
+        $filename = basename($_FILES['slika']['name']);
+        $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
+        $slika_path = 'slike_pesmi/' . $filename;
+        move_uploaded_file($_FILES['slika']['tmp_name'], $slika_path);
     }
-    $filename = basename($_FILES['slika']['name']);
-    $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
-    $slika_path = 'slike_pesmi/' . $filename;
-    move_uploaded_file($_FILES['slika']['tmp_name'], $slika_path);
-}
 
-    // Vstavi pesem v bazo z uporabo polj pod_do_pesmi in pot_do_slike
     $stmt = mysqli_prepare($conn, "
-        INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
-    mysqli_stmt_bind_param($stmt, 'sssss', $ime, $leto, $dolzina, $audio_path, $slika_path);
+    mysqli_stmt_bind_param($stmt, 'sssssi', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id);
     mysqli_stmt_execute($stmt);
     $pesem_id = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
 
-    // Poveži izvajalca
     if ($pesem_id && $izvajalec_id) {
         $stmt2 = mysqli_prepare($conn, "
             INSERT INTO pesem_izvajalci (pesem_id, izvajalec_id)
@@ -65,13 +76,6 @@ if (isset($_FILES['slika']) && $_FILES['slika']['error'] === 0) {
     }
 
     $sporocilo = "Pesem uspešno dodana!";
-}
-
-// Pridobi seznam izvajalcev
-$izvajalci = [];
-$res = mysqli_query($conn, "SELECT id, Ime FROM Izvajalci ORDER BY Ime ASC");
-while ($row = mysqli_fetch_assoc($res)) {
-    $izvajalci[] = $row;
 }
 ?>
 
@@ -100,9 +104,18 @@ while ($row = mysqli_fetch_assoc($res)) {
 
         <label>Izvajalec:
             <select name="izvajalec" required>
-                <option value="">-- izberi izvajalca --</option>
+                <option value=""> izberi izvajalca </option>
                 <?php foreach ($izvajalci as $iz): ?>
                     <option value="<?= $iz['id'] ?>"><?= htmlspecialchars($iz['Ime']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label><br><br>
+
+        <label>Žanr:
+            <select name="zanr" required>
+                <option value=""> izberi žanr </option>
+                <?php foreach ($zanri as $z): ?>
+                    <option value="<?= $z['id'] ?>"><?= htmlspecialchars($z['Ime']) ?></option>
                 <?php endforeach; ?>
             </select>
         </label><br><br>
