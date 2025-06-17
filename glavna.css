@@ -71,6 +71,7 @@ body {
     border-radius: 10px;
     width: 700px;
     margin:0 auto;
+    position: relative;
 }
 
 #uredi_pesem {
@@ -89,4 +90,28 @@ body {
     border-radius: 10px;
     width: 700px;
     margin:0 auto;
+}
+
+#dodaj_album{
+    background-color: floralwhite;
+    outline: 1px solid gray;
+    padding: 20px;
+    border-radius: 10px;
+    width: 700px;
+    margin:0 auto;
+}
+
+#nazaj_gumb{
+    float:left;
+    background-color: floralwhite;
+    outline: 1px solid gray;
+    margin-left: 20px;
+    border-radius: 10px;
+    width: 100px;
+    text-align: center;
+    margin-top:10px;
+}
+
+#nazajtext{
+    text-decoration: none;
 }

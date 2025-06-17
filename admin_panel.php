@@ -26,8 +26,16 @@ while ($row = mysqli_fetch_assoc($res_zanri)) {
     $zanri[] = $row;
 }
 
+// Pridobi seznam albumov
+$albumi = [];
+$res_albumi = mysqli_query($conn, "SELECT id, Ime FROM Albumi ORDER BY Ime ASC");
+while ($row = mysqli_fetch_assoc($res_albumi)) {
+    $albumi[] = $row;
+}
+
 $sporocilo = '';
 $sporocilo_izvajalec = '';
+$sporocilo_album = '';
 
 // Obdelava obrazca za dodajanje pesmi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
@@ -36,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
     $dolzina = $_POST['dolzina'] ?? '';
     $izvajalec_id = (int)($_POST['izvajalec'] ?? 0);
     $zanr_id = (int)($_POST['zanr'] ?? 0);
+    $album_id = (int)($_POST['album'] ?? 0);
 
     $audio_path = '';
     if (isset($_FILES['mp3']) && $_FILES['mp3']['error'] === 0) {
@@ -60,10 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
     }
 
     $stmt = mysqli_prepare($conn, "
-        INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ");
-    mysqli_stmt_bind_param($stmt, 'sssssi', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id);
+    mysqli_stmt_bind_param($stmt, 'sssssii', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id, $album_id);
     mysqli_stmt_execute($stmt);
     $pesem_id = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
@@ -89,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
     if ($ime_izvajalca === '') {
         $sporocilo_izvajalec = "Ime izvajalca ne sme biti prazno.";
     } else {
-        // Preveri, če izvajalec že obstaja
         $stmt = mysqli_prepare($conn, "SELECT id FROM Izvajalci WHERE Ime = ?");
         mysqli_stmt_bind_param($stmt, 's', $ime_izvajalca);
         mysqli_stmt_execute($stmt);
@@ -97,9 +105,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
 
         if (mysqli_stmt_num_rows($stmt) > 0) {
             $sporocilo_izvajalec = "Ta izvajalec že obstaja.";
-            mysqli_stmt_close($stmt);  // zapri po preverjanju
+            mysqli_stmt_close($stmt);
         } else {
-            mysqli_stmt_close($stmt);  // zapri po preverjanju
+            mysqli_stmt_close($stmt);
 
             $stmt = mysqli_prepare($conn, "INSERT INTO Izvajalci (Ime, Opis) VALUES (?, ?)");
             mysqli_stmt_bind_param($stmt, 'ss', $ime_izvajalca, $opis_izvajalca);
@@ -109,21 +117,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
             } else {
                 $sporocilo_izvajalec = "Napaka pri dodajanju izvajalca.";
             }
-            mysqli_stmt_close($stmt);  // zapri po vnosu
+            mysqli_stmt_close($stmt);
         }
     }
 }
 
+// Obdelava obrazca za dodajanje albuma
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_album'])) {
+    $ime_albuma = trim($_POST['ime_albuma'] ?? '');
+    $opis_albuma = trim($_POST['opis_albuma'] ?? '');
+    $izvajalec_id = (int)($_POST['izvajalci_album'] ?? 0);
+
+    if ($ime_albuma === '' || !$izvajalec_id) {
+        $sporocilo_album = "Vnesi ime albuma in izberi izvajalca.";
+    } else {
+        $stmt = mysqli_prepare($conn, "INSERT INTO Albumi (Ime, Opis) VALUES (?, ?)");
+        mysqli_stmt_bind_param($stmt, 'ss', $ime_albuma, $opis_albuma);
+
+        if (mysqli_stmt_execute($stmt)) {
+            $album_id = mysqli_insert_id($conn);
+            mysqli_stmt_close($stmt);
+
+            // Shrani povezavo v album_izvajalci
+            $stmt2 = mysqli_prepare($conn, "INSERT INTO album_izvajalci (album_id, izvajalec_id) VALUES (?, ?)");
+            mysqli_stmt_bind_param($stmt2, 'ii', $album_id, $izvajalec_id);
+            mysqli_stmt_execute($stmt2);
+            mysqli_stmt_close($stmt2);
+
+            $sporocilo_album = "Album uspešno dodan!";
+        } else {
+            $sporocilo_album = "Napaka pri dodajanju albuma.";
+            mysqli_stmt_close($stmt);
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="sl">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel - Dodaj pesem in izvajalca</title>
+    <title>Admin Panel - Dodaj pesem, izvajalca in album</title>
     <link rel="stylesheet" href="glavna.css">
 </head>
 <body>
+    
+<div id="nazaj_gumb">
+    <h2><a href="admin_glavna.php" id="nazajtext">Nazaj</a></h2>
+</div>
+
 <div id="dodaj_pesem">
     <h1>Dodaj novo pesem</h1>
 
@@ -136,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
 
         <label>Ime pesmi: <input type="text" name="ime" required></label><br><br>
         <label>Leto izdaje: <input type="text" name="leto_izdaje" required></label><br><br>
-        <label>Dolžina (ure:minute:sekunde): <input type="text" name="dolzina" required></label><br><br>
+        <label>Dolžina (hh:mm:ss): <input type="text" name="dolzina" required></label><br><br>
 
         <label>MP3 datoteka: <input type="file" name="mp3" accept=".mp3" required></label><br><br>
         <label>Slika pesmi: <input type="file" name="slika" accept="image/*" required></label><br><br>
@@ -159,8 +201,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
             </select>
         </label><br><br>
 
+        <label>Album:
+            <select name="album">
+                <option value="">izberi album</option>
+                <?php foreach ($albumi as $album): ?>
+                    <option value="<?= $album['id'] ?>"><?= htmlspecialchars($album['Ime']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label><br><br>
+
         <button type="submit">Dodaj pesem</button>
-        <h2><a href="admin_glavna.php">Nazaj</a></h2>
+        
     </form>
 </div>
 
@@ -178,6 +229,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
         <label>Opis izvajalca: <input type="text" name="opis_izvajalca" placeholder="Vnesite opis izvajalca"></label><br><br>
 
         <button type="submit">Dodaj izvajalca</button>
+    </form>
+</div>
+
+<div id="dodaj_album" style="margin-top:50px;">
+    <h1>Dodaj nov album</h1>
+
+    <?php if (!empty($sporocilo_album)): ?>
+        <p style="color: green;"><?= htmlspecialchars($sporocilo_album) ?></p>
+    <?php endif; ?>
+
+    <form method="post">
+        <input type="hidden" name="dodaj_album" value="1">
+
+        <label>Ime albuma: <input type="text" name="ime_albuma" required></label><br><br>
+        <label>Opis albuma: <input type="text" name="opis_albuma" placeholder="Vnesite opis albuma"></label><br><br>
+
+        <label>Izvajalci:
+            <select name="izvajalci_album" required>
+                <option value="">Izberi izvajalca</option>
+                <?php foreach ($izvajalci as $iz): ?>
+                    <option value="<?= $iz['id'] ?>"><?= htmlspecialchars($iz['Ime']) ?></option>
+                <?php endforeach; ?>
+            </select>  
+        </label><br><br>
+
+        <button type="submit">Dodaj album</button>
     </form>
 </div>
 
