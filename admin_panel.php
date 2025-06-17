@@ -275,10 +275,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dodaj_album'])) {
 <div id="dodaj_album" style="margin-top:50px;">
     <h1>Dodaj nov album</h1>
 
-    <?php
-    if ($sporocilo_album != "") {
-        echo '<p style="color: green;">' . htmlspecialchars($sporocilo_album) . '</p>';
-    }
-    ?>
+    <?php if (!empty($sporocilo_album)): ?>
+        <p style="color: green;"><?= htmlspecialchars($sporocilo_album) ?></p>
+    <?php endif; ?>
 
-    <form method="post
+    <form method="post">
+        <input type="hidden" name="dodaj_album" value="1">
+
+        <label>Ime albuma: <input type="text" name="ime_albuma" required></label><br><br>
+        <label>Opis albuma: <input type="text" name="opis_albuma" placeholder="Vnesite opis albuma"></label><br><br>
+
+        <label>Izvajalci:
+            <select name="izvajalci_album" required>
+                <option value="">Izberi izvajalca</option>
+                <?php foreach ($izvajalci as $iz): ?>
+                    <option value="<?= $iz['id'] ?>"><?= htmlspecialchars($iz['Ime']) ?></option>
+                <?php endforeach; ?>
+            </select>  
+        </label><br><br>
+
+        <button type="submit">Dodaj album</button>
+    </form>
+</div>
+</body>
+<footer id="footer">
+    Viri: <a href="https://www.w3schools.com" target="_blank">w3schools</a>, 
+    <a href="https://ucilnice.arnes.si" target="_blank">Arnes učilnice</a> in zvezek.
+</footer>
+</html>
