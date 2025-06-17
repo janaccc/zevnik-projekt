@@ -1,6 +1,7 @@
 <?php
 /*
-povezava na streznik
+Povezava na server
+htmlspecialchar() je za pretvarjanje posebnih znakov v varne html entitete
 */
 
 $host='localhost';
