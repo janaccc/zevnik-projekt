@@ -2,21 +2,18 @@
 require_once 'session.php';
 require_once 'povezava.php';
 
-// Preveri, če je uporabnik prijavljen (brez admin preverjanja)
 if (!isset($_SESSION['user'])) {
     header("Location: prijava.php");
     exit();
 }
 
-// Inicializiraj spremenljivke
 $pesmi = array();
 $trenutna_pesem = null;
 $uporabnik_id = $_SESSION['id'];
 
-// Obdelaj Like gumb, če je bila poslana POST zahteva
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['like_pesem_id'])) {
-        // Dodaj pesem v všečke
+        // preveri če je metoda post in če je uporabnik kliknil gumb like
         $pesem_id = intval($_POST['like_pesem_id']);
         $statement = mysqli_prepare($conn, "INSERT IGNORE INTO uporabniki_like (uporabnik_id, pesem_id) VALUES (?, ?)");
         mysqli_stmt_bind_param($statement, "ii", $uporabnik_id, $pesem_id);
@@ -25,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: glavna.php?id=" . $pesem_id);
         exit();
     } elseif (isset($_POST['unlike_pesem_id'])) {
-        // Odstrani pesem iz všečkov
+        // Odstrani pesem iz všečkov če klikne unlike
         $pesem_id = intval($_POST['unlike_pesem_id']);
         $statement = mysqli_prepare($conn, "DELETE FROM uporabniki_like WHERE uporabnik_id = ? AND pesem_id = ?");
         mysqli_stmt_bind_param($statement, "ii", $uporabnik_id, $pesem_id);
@@ -36,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pridobi vse pesmi z osnovnimi podatki (brez admin polj)
+// Pridobi vse pesmi, prikazana pesem je prva iz seznama, trenutna pesem se shrani v $trenutna_pesem
 $sql = "SELECT 
             Pesmi.id AS pesem_id,
             Pesmi.Ime AS pesem_naslov,
@@ -63,7 +60,7 @@ if ($rezultat && mysqli_num_rows($rezultat) > 0) {
     }
 }
 
-// Funkcija za pridobitev izvajalcev za določeno pesem
+//pridobitev izvajalcev za določeno pesem
 function getIzvajalciZaPesem($povezava, $pesem_id) {
     $izvajalci = array();
     $sql = "SELECT Ime

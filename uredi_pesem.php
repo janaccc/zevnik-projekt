@@ -35,21 +35,20 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 $pesem_id = intval($_GET['id']);
 
-// Obdelava izbrisa pesmi
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete']) && $_POST['delete'] == '1') {
-    // Izbriši povezave z izvajalci za to pesem
+    // najprej izbrisi povezavo z izvajalcem in pesmijo
     $poizvedba_brisi_izvajalci = "DELETE FROM pesem_izvajalci WHERE pesem_id = " . $pesem_id;
     mysqli_query($conn, $poizvedba_brisi_izvajalci);
 
-    // Izbriši uporabniške všečke za to pesem
+    // izbrisi like za to pesem
     $poizvedba_brisi_like = "DELETE FROM Uporabniki_like WHERE pesem_id = " . $pesem_id;
     mysqli_query($conn, $poizvedba_brisi_like);
 
-    // Izbriši pesem
+    // izbriši pesem
     $poizvedba_brisi_pesem = "DELETE FROM Pesmi WHERE id = " . $pesem_id;
     mysqli_query($conn, $poizvedba_brisi_pesem);
 
-    // Preusmeri nazaj
+    // "refresh"
     header("Location: admin_glavna.php");
     exit();
 }
@@ -62,21 +61,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['delete'])) {
     $izvajalec_id = isset($_POST['izvajalec']) ? intval($_POST['izvajalec']) : 0;
     $zanr_id = isset($_POST['zanr']) ? intval($_POST['zanr']) : 0;
 
-    // Naloži trenutne poti do datotek, da jih ohranimo (ker ne spreminjamo slik/avdia)
+    // Naloži trenutne poti do datotek(mp3 ali slika)
     $poizvedba_poti = "SELECT pod_do_pesmi, pot_do_slike FROM Pesmi WHERE id = " . $pesem_id . " LIMIT 1";
     $rezultat_poti = mysqli_query($conn, $poizvedba_poti);
     $vrstica_poti = mysqli_fetch_assoc($rezultat_poti);
     $audio_path = $vrstica_poti['pod_do_pesmi'];
     $slika_path = $vrstica_poti['pot_do_slike'];
 
-    // Update brez menjave mp3 in slike - pripravi poizvedbo z mysqli_prepare
+    // Update brez menjave mp3 in slike
     $poizvedba_update = "UPDATE Pesmi SET Ime = ?, leto_izdaje = ?, Dolzina = ?, pod_do_pesmi = ?, pot_do_slike = ?, zanr_id = ? WHERE id = ?";
     $pripravi = mysqli_prepare($conn, $poizvedba_update);
     mysqli_stmt_bind_param($pripravi, "ssssiii", $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id, $pesem_id);
     mysqli_stmt_execute($pripravi);
     mysqli_stmt_close($pripravi);
 
-    // Posodobi izvajalca: izbriši obstoječe povezave in vstavi novo
+    // Posodobi izvajalca, izbris obstojecih povezav z pesmijo
     $poizvedba_izbrisi_izvajalce = "DELETE FROM pesem_izvajalci WHERE pesem_id = " . $pesem_id;
     mysqli_query($conn, $poizvedba_izbrisi_izvajalce);
     if ($izvajalec_id > 0) {
@@ -90,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['delete'])) {
     $sporocilo = "Pesem uspešno posodobljena!";
 }
 
-// Pridobi podatke pesmi za predizpolnitev
+// Pridobi podatke pesmi da je input vnaprej izpolnjen
 $poizvedba_pesem = "
     SELECT Pesmi.*, pesem_izvajalci.izvajalec_id
     FROM Pesmi

@@ -1,5 +1,5 @@
 <?php
-require_once 'povezava.php'; // mora vsebovati $conn = mysqli_connect(...)
+require_once 'povezava.php';
 
 if (!$conn) {
     die("Napaka pri povezavi z bazo: " . mysqli_connect_error());

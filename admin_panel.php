@@ -2,13 +2,13 @@
 require_once 'session.php';
 require_once 'povezava.php';
 
-// Preveri, če je uporabnik prijavljen
+// Preveri če je uporabnik prijavljen
 if (!isset($_SESSION['user'])) {
     header("Location: prijava.php");
     exit();
 }
 
-// Preveri, če je uporabnik admin
+// Preveri če je uporabnik admin
 if ($_SESSION['vloga'] !== 'admin') {
     header("Location: glavna.php");
     exit();
@@ -34,7 +34,7 @@ if ($rezultat_zanri) {
     }
 }
 
-// Pridobi seznam albumov
+//Pridobi seznam albumov
 $albumi = array();
 $poizvedba_albumi = "SELECT id, Ime FROM Albumi ORDER BY Ime ASC";
 $rezultat_albumi = mysqli_query($conn, $poizvedba_albumi);
@@ -48,7 +48,7 @@ $sporocilo = "";
 $sporocilo_izvajalec = "";
 $sporocilo_album = "";
 
-// Obdelava obrazca za dodajanje pesmi
+//Obdelava obrazca za dodajanje pesmi
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dodaj_pesem'])) {
 
     $ime = isset($_POST['ime']) ? $_POST['ime'] : "";
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dodaj_pesem'])) {
             mkdir('pesmi', 0777, true);
         }
         $filename = basename($_FILES['mp3']['name']);
-        $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
+        $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename); //zamenja vse znake ki niso crke z _
         $audio_path = 'pesmi/' . $filename;
         move_uploaded_file($_FILES['mp3']['tmp_name'], $audio_path);
     }
@@ -94,13 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dodaj_pesem'])) {
         $poizvedba = "INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
                       VALUES (?, ?, ?, ?, ?, ?, NULL)";
         $stmt = mysqli_prepare($conn, $poizvedba);
-        // Tipi: ime, leto, dolzina, pod_do_pesmi, pot_do_slike so stringi, zanr_id je int
-        mysqli_stmt_bind_param($stmt, "sssssi", $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id);
+        
+        mysqli_stmt_bind_param($stmt, "sssssi" /*string,string... integer... */, $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id);
     } else {
         $poizvedba = "INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
-                      VALUES (?, ?, ?, ?, ?, ?, ?)";
+                      VALUES (?, ?, ?, ?, ?, ?, ?)"; //? je placeholder in se nadomesti kasneje z vrednostjo
         $stmt = mysqli_prepare($conn, $poizvedba);
-        // Tipi: ime, leto, dolzina, pod_do_pesmi, pot_do_slike so stringi, zanr_id, album_id so int
+        
         mysqli_stmt_bind_param($stmt, "sssssii", $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id, $album_id);
     }
 

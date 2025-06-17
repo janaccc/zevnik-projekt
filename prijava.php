@@ -1,8 +1,8 @@
 <?php
-require_once 'povezava.php'; // vsebuje $conn
-require_once 'session.php';  // vsebuje session_start()
+require_once 'povezava.php'; 
+require_once 'session.php'; 
 
-// Če je uporabnik že prijavljen, ga preusmeri glede na vlogo
+
 if (isset($_SESSION['user']) && isset($_SESSION['vloga'])) {
     if ($_SESSION['vloga'] === 'admin') {
         header("Location: admin_glavna.php");

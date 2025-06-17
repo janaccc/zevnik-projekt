@@ -17,7 +17,7 @@ $pesmi = array();
 $trenutna_pesem = null;
 $vsecki = array();
 
-// Obdelava všečkov
+// ce je poslan obrazec z post
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['like_pesem_id'])) {
         $pesem_id = (int) $_POST['like_pesem_id'];
@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sql = "DELETE FROM uporabniki_like WHERE uporabnik_id = " . $uporabnik_id . " AND pesem_id = " . $pesem_id;
         mysqli_query($conn, $sql);
 
-        header("Location: admin_glavna.php");
+        header("Location: admin_glavna.php"); //ce uporabnik vsecka ali vsecka ga preusmeri nazaj na isto stran(refresh)
         exit();
     }
 }
 
-// Pridobi vse pesmi
+// pridobi vse pesmi za seznam
 $sql_pesmi = "
     SELECT 
         Pesmi.id AS pesem_id,
