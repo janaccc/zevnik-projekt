@@ -6,10 +6,11 @@ require_once 'session.php';  // vsebuje session_start()
 if (isset($_SESSION['user']) && isset($_SESSION['vloga'])) {
     if ($_SESSION['vloga'] === 'admin') {
         header("Location: admin_glavna.php");
+        exit();
     } else {
         header("Location: glavna.php");
+        exit();
     }
-    exit;
 }
 
 $napaka = '';
@@ -21,26 +22,27 @@ if (isset($_POST['prijava'])) {
     if (empty($uporabnisko_ime) || empty($geslo)) {
         $napaka = "Vnesite uporabniško ime in geslo.";
     } else {
-        $stmt = mysqli_prepare($conn, "SELECT id, password, vloga FROM uporabniki WHERE user = ?");
-        mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
+        $statement = mysqli_prepare($conn, "SELECT id, password, vloga FROM uporabniki WHERE user = ?");
+        mysqli_stmt_bind_param($statement, "s", $uporabnisko_ime);
+        mysqli_stmt_execute($statement);
+        mysqli_stmt_store_result($statement);
 
-        if (mysqli_stmt_num_rows($stmt) === 1) {
-            mysqli_stmt_bind_result($stmt, $id, $hashed_password, $vloga);
-            mysqli_stmt_fetch($stmt);
+        if (mysqli_stmt_num_rows($statement) === 1) {
+            mysqli_stmt_bind_result($statement, $id, $hashed_geslo, $vloga);
+            mysqli_stmt_fetch($statement);
 
-            if (password_verify($geslo, $hashed_password)) {
+            if (password_verify($geslo, $hashed_geslo)) {
                 $_SESSION['id'] = $id;
                 $_SESSION['user'] = $uporabnisko_ime;
                 $_SESSION['vloga'] = $vloga;
 
                 if ($vloga === 'admin') {
                     header("Location: admin_glavna.php");
+                    exit();
                 } else {
                     header("Location: glavna.php");
+                    exit();
                 }
-                exit;
             } else {
                 $napaka = "Napačno geslo.";
             }
@@ -48,34 +50,34 @@ if (isset($_POST['prijava'])) {
             $napaka = "Uporabnik ne obstaja.";
         }
 
-        mysqli_stmt_close($stmt);
+        mysqli_stmt_close($statement);
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-    <link rel="stylesheet" type="text/css" href="index.css"/>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prijava v aplikacijo</title>
 </head>
 <body>
 <section id="section">
     <h1>Prijava</h1>
 
-    <?php if (!empty($napaka)): ?>
-        <div style="color:red;"><?= htmlspecialchars($napaka) ?></div>
+    <?php if ($napaka != ''): ?>
+        <div style="color:red;"><?php echo htmlspecialchars($napaka); ?></div>
     <?php endif; ?>
 
     <p id="prvi">
         Za uporabo aplikacije je potrebna prijava.
     </p>
     <form action="" method="POST">
-        Uporabniško ime: <input type="text" name="naziv" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
-        Geslo: <input type="password" name="tip" required class="vnos" placeholder="Vnesi geslo"><br>
+        Uporabniško ime: <input type="text" name="naziv" required class="vnos" placeholder="Vnesi uporabniško ime" /><br />
+        Geslo: <input type="password" name="tip" required class="vnos" placeholder="Vnesi geslo" /><br />
         <div>
-            <input type="submit" name="prijava" value="Prijava" id="posljigumb">
+            <input type="submit" name="prijava" value="Prijava" id="posljigumb" />
             <a href="registracija.php"><button type="button" id="registergumb">Registracija</button></a>
         </div>
     </form>

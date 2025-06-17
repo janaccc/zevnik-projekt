@@ -17,65 +17,61 @@ if (isset($_POST['registergumb'])) {
     if (empty($uporabnisko_ime) || empty($geslo)) {
         $napaka = "Vsa polja so obvezna.";
     } else {
-        // Preverimo, če uporabnik že obstaja
-        $stmt = mysqli_prepare($conn, "SELECT id FROM uporabniki WHERE user = ?");
-        mysqli_stmt_bind_param($stmt, "s", $uporabnisko_ime);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
+        $pripravi_poizvedbo = mysqli_prepare($conn, "SELECT id FROM uporabniki WHERE user = ?");
+        mysqli_stmt_bind_param($pripravi_poizvedbo, "s", $uporabnisko_ime);
+        mysqli_stmt_execute($pripravi_poizvedbo);
+        mysqli_stmt_store_result($pripravi_poizvedbo);
 
-        if (mysqli_stmt_num_rows($stmt) > 0) {
+        if (mysqli_stmt_num_rows($pripravi_poizvedbo) > 0) {
             $napaka = "Uporabniško ime je že zasedeno.";
         } else {
-            // Hash gesla
-            $hashed_password = password_hash($geslo, PASSWORD_DEFAULT);
+            $varnostno_geslo = password_hash($geslo, PASSWORD_DEFAULT);
 
-            // Vnos novega uporabnika
-            $stmt_insert = mysqli_prepare($conn, "INSERT INTO uporabniki (user, password) VALUES (?, ?)");
-            mysqli_stmt_bind_param($stmt_insert, "ss", $uporabnisko_ime, $hashed_password);
+            $pripravi_vnos = mysqli_prepare($conn, "INSERT INTO uporabniki (user, password) VALUES (?, ?)");
+            mysqli_stmt_bind_param($pripravi_vnos, "ss", $uporabnisko_ime, $varnostno_geslo);
 
-            if (mysqli_stmt_execute($stmt_insert)) {
+            if (mysqli_stmt_execute($pripravi_vnos)) {
                 $uspeh = "Registracija uspešna. Preusmerjam na prijavo...";
                 header("Refresh: 3; URL=prijava.php");
             } else {
                 $napaka = "Napaka pri vnosu v bazo.";
             }
-            mysqli_stmt_close($stmt_insert);
+            mysqli_stmt_close($pripravi_vnos);
         }
 
-        mysqli_stmt_close($stmt);
+        mysqli_stmt_close($pripravi_poizvedbo);
     }
-} // <-- tukaj manjka zaključni oklepaj
-
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-    <link rel="stylesheet" type="text/css" href="index.css"/>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registracija</title>
 </head>
 <body>
 <section id="section">
     <h1>Registracija</h1>
 
-    <?php if (!empty($napaka)): ?>
-        <div style="color: red;"><?= htmlspecialchars($napaka) ?></div>
-    <?php endif; ?>
+    <?php if ($napaka != '') { ?>
+        <div style="color: red;"><?php echo htmlspecialchars($napaka); ?></div>
+    <?php } ?>
 
-    <?php if (!empty($uspeh)): ?>
-        <div style="color: green;"><?= htmlspecialchars($uspeh) ?></div>
-    <?php endif; ?>
+    <?php if ($uspeh != '') { ?>
+        <div style="color: green;"><?php echo htmlspecialchars($uspeh); ?></div>
+    <?php } ?>
 
     <p id="prvi">
         Vnesite podatke za registracijo.
     </p>
     <form action="" method="POST">
-        <b>Uporabniško ime:</b> <input type="text" name="uporabnisko_ime" required class="vnos" placeholder="Vnesi uporabniško ime"><br>
-        <b>Geslo:</b> <input type="password" name="geslo" required class="vnos" placeholder="Vnesi geslo"><br>
+        <b>Uporabniško ime:</b> <input type="text" name="uporabnisko_ime" required class="vnos" placeholder="Vnesi uporabniško ime" /><br />
+        <b>Geslo:</b> <input type="password" name="geslo" required class="vnos" placeholder="Vnesi geslo" /><br />
         <div>
-            <input type="submit" name="registergumb" value="Registracija" id="posljigumb">
+            <input type="submit" name="registergumb" value="Registracija" id="posljigumb" />
             <a href="prijava.php"><button type="button" id="registergumb">Nazaj na prijavo?</button></a>
         </div>
     </form>

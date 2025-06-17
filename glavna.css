@@ -128,7 +128,7 @@ body {
     margin-top:500px;
 }
 
-#like_gumb, #unlike_gumb {
+#like_gumb, .unlike_gumb {
         border-radius: 12px;
     background: dodgerblue;
     text-align: center;
