@@ -44,7 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
     $dolzina = $_POST['dolzina'] ?? '';
     $izvajalec_id = (int)($_POST['izvajalec'] ?? 0);
     $zanr_id = (int)($_POST['zanr'] ?? 0);
-    $album_id = (int)($_POST['album'] ?? 0);
+
+    // Preveri album_id - lahko je NULL
+    $album_id = $_POST['album'] ?? null;
+    if ($album_id === '' || $album_id == 0) {
+        $album_id = null;
+    } else {
+        $album_id = (int)$album_id;
+    }
 
     $audio_path = '';
     if (isset($_FILES['mp3']) && $_FILES['mp3']['error'] === 0) {
@@ -68,11 +75,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
         move_uploaded_file($_FILES['slika']['tmp_name'], $slika_path);
     }
 
-    $stmt = mysqli_prepare($conn, "
-        INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    mysqli_stmt_bind_param($stmt, 'sssssii', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id, $album_id);
+    if ($album_id === null) {
+        $stmt = mysqli_prepare($conn, "
+            INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
+            VALUES (?, ?, ?, ?, ?, ?, NULL)
+        ");
+        mysqli_stmt_bind_param($stmt, 'ssssii', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id);
+    } else {
+        $stmt = mysqli_prepare($conn, "
+            INSERT INTO Pesmi (Ime, leto_izdaje, Dolzina, pod_do_pesmi, pot_do_slike, zanr_id, album_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        mysqli_stmt_bind_param($stmt, 'ssssiii', $ime, $leto, $dolzina, $audio_path, $slika_path, $zanr_id, $album_id);
+    }
+
     mysqli_stmt_execute($stmt);
     $pesem_id = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
@@ -89,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_pesem'])) {
 
     $sporocilo = "Pesem uspešno dodana!";
 }
-
 // Obdelava obrazca za dodajanje izvajalcev
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_izvajalec'])) {
     $ime_izvajalca = trim($_POST['ime_izvajalca'] ?? '');
@@ -259,4 +274,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_album'])) {
 </div>
 
 </body>
+<footer id="footer">
+    Viri: <a href="https://www.w3schools.com" target="_blank">w3schools</a>, 
+    <a href="https://ucilnice.arnes.si" target="_blank">Arnes učilnice</a> in zvezek.
+</footer>
 </html>

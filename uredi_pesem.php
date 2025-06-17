@@ -138,4 +138,8 @@ $pesem = mysqli_fetch_assoc($result);
     </form>
 </div>
 </body>
+<footer id="footer">
+    Viri: <a href="https://www.w3schools.com" target="_blank">w3schools</a>, 
+    <a href="https://ucilnice.arnes.si" target="_blank">Arnes učilnice</a> in zvezek.
+</footer>
 </html>

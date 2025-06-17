@@ -115,3 +115,34 @@ body {
 #nazajtext{
     text-decoration: none;
 }
+
+#vsecki{
+        outline: 1px solid gray;
+    padding: 20px;
+    background-repeat: no-repeat;
+    background-position: top right;
+    border-radius: 10px;
+    width: 300px;
+    background-color: floralwhite;
+    position:absolute;
+    margin-top:500px;
+}
+
+#like_gumb, #unlike_gumb {
+        border-radius: 12px;
+    background: dodgerblue;
+    text-align: center;
+    height: 40px;
+    line-height: 30px;
+    width: 100px;
+    cursor: pointer;
+    font-weight:bold;
+}
+
+#footer {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    text-align: center;
+    font-size: 14px;
+}

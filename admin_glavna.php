@@ -14,8 +14,32 @@ if ($_SESSION['vloga'] !== 'admin') {
 
 $pesmi = [];
 $trenutna_pesem = null;
+$uporabnik_id = $_SESSION['id'];
 
-// Pridobi vse pesmi z osnovnimi podatki, vključno z audio in sliko
+// Obdelaj Like gumb
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['like_pesem_id'])) {
+        // Dodaj v všečke
+        $pesem_id = (int)$_POST['like_pesem_id'];
+        $stmt = $conn->prepare("INSERT IGNORE INTO uporabniki_like (uporabnik_id, pesem_id) VALUES (?, ?)");
+        $stmt->bind_param("ii", $uporabnik_id, $pesem_id);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: admin_glavna.php?id=" . $pesem_id);
+        exit;
+    } elseif (isset($_POST['unlike_pesem_id'])) {
+        // Odstrani iz všečkov
+        $pesem_id = (int)$_POST['unlike_pesem_id'];
+        $stmt = $conn->prepare("DELETE FROM uporabniki_like WHERE uporabnik_id = ? AND pesem_id = ?");
+        $stmt->bind_param("ii", $uporabnik_id, $pesem_id);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: admin_glavna.php");
+        exit;
+    }
+}
+
+// Pridobi vse pesmi
 $sql = "
     SELECT 
         Pesmi.id AS pesem_id,
@@ -48,7 +72,7 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 
-// Funkcija za pridobivanje izvajalcev za dano pesem
+// Funkcija za izvajalce
 function getIzvajalciZaPesem($conn, $pesem_id) {
     $izvajalci = [];
     $sql = "
@@ -64,6 +88,22 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
         }
     }
     return $izvajalci;
+}
+
+// Pridobi všečkane pesmi trenutnega uporabnika
+$vsecki = [];
+$sql_vsecki = "
+    SELECT Pesmi.id, Pesmi.Ime
+    FROM uporabniki_like
+    INNER JOIN Pesmi ON uporabniki_like.pesem_id = Pesmi.id
+    WHERE uporabniki_like.uporabnik_id = $uporabnik_id
+    ORDER BY Pesmi.Ime ASC
+";
+$result_vsecki = mysqli_query($conn, $sql_vsecki);
+if ($result_vsecki && mysqli_num_rows($result_vsecki) > 0) {
+    while ($row = mysqli_fetch_assoc($result_vsecki)) {
+        $vsecki[] = $row;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -83,18 +123,39 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
     <section id="meni">
         <h1 id="meniH1">Meni</h1>
         <h2 id="odjava"><a href="odjava.php">Odjava</a></h2>
-<ol id="pesmi">
-    <?php foreach ($pesmi as $pesem): ?>
-        <li>
-            <a href="admin_glavna.php?id=<?= $pesem['pesem_id'] ?>">
-                <?= htmlspecialchars($pesem['pesem_naslov']) ?>
-            </a>
-            <a href="uredi_pesem.php?id=<?= $pesem['pesem_id'] ?>" style="margin-left: 10px;">
-                <button>Uredi</button>
-            </a>
-        </li>
-    <?php endforeach; ?>
-</ol>
+        <ol id="pesmi">
+            <?php foreach ($pesmi as $pesem): ?>
+                <li>
+                    <a href="admin_glavna.php?id=<?= $pesem['pesem_id'] ?>">
+                        <?= htmlspecialchars($pesem['pesem_naslov']) ?>
+                    </a>
+                    <a href="uredi_pesem.php?id=<?= $pesem['pesem_id'] ?>" style="margin-left: 10px;">
+                        <button>Uredi</button>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </section>
+
+    <section id="vsecki">
+        <h1 id="vseckiH1">Všečki</h1>
+        <?php if (!empty($vsecki)): ?>
+            <ol>
+                <?php foreach ($vsecki as $v): ?>
+                    <li>
+                        <a href="admin_glavna.php?id=<?= $v['id'] ?>">
+                            <?= htmlspecialchars($v['Ime']) ?>
+                        </a>
+                        <form method="POST" style="display:inline; margin-left:10px;">
+                            <input type="hidden" name="unlike_pesem_id" value="<?= $v['id'] ?>">
+                            <button type="submit" id="unlike_gumb">Unlike</button>
+                        </form>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php else: ?>
+            <p>Ni všečkanih pesmi.</p>
+        <?php endif; ?>
     </section>
 
     <section id="predvajalnik">
@@ -119,6 +180,13 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
             <?php else: ?>
                 <p><em>Ni datoteke za predvajanje.</em></p>
             <?php endif; ?>
+
+            <!-- Gumb Like -->
+            <form method="POST" style="margin-top: 15px;">
+                <input type="hidden" name="like_pesem_id" value="<?= $trenutna_pesem['pesem_id'] ?>">
+                <button type="submit" id="like_gumb">Like</button>
+            </form>
+
         <?php else: ?>
             <p>Ni pesmi za prikaz.</p>
         <?php endif; ?>
@@ -126,4 +194,8 @@ function getIzvajalciZaPesem($conn, $pesem_id) {
 </div>
 
 </body>
+<footer id="footer">
+    Viri: <a href="https://www.w3schools.com" target="_blank">w3schools</a>, 
+    <a href="https://ucilnice.arnes.si" target="_blank">Arnes učilnice</a> in zvezek.
+</footer>
 </html>
