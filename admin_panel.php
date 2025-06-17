@@ -216,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['dodaj_album'])) {
         <label>MP3 datoteka: <input type="file" name="mp3" accept=".mp3" required /></label><br /><br />
         <label>Slika pesmi: <input type="file" name="slika" accept="image/*" required /></label><br /><br />
 
-        <label>Izvajalec:
+        <label>Izvajelec:
             <select name="izvajalec" required>
                 <option value="">izberi izvajalca</option>
                 <?php
