@@ -4,7 +4,7 @@ require_once 'povezava.php';
 
 // Preveri prijavo in vlogo
 if (!isset($_SESSION['user'])) {
-    header("Location: prijava.php");
+    header("Location: index.php");
     exit();
 }
 if ($_SESSION['vloga'] !== 'admin') {

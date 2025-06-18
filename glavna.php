@@ -3,7 +3,7 @@ require_once 'session.php';
 require_once 'povezava.php';
 
 if (!isset($_SESSION['user'])) {
-    header("Location: prijava.php");
+    header("Location: index.php");
     exit();
 }
 

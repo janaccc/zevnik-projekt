@@ -32,7 +32,7 @@ if (isset($_POST['registergumb'])) {
 
             if (mysqli_stmt_execute($pripravi_vnos)) {
                 $uspeh = "Registracija uspešna. Preusmerjam na prijavo...";
-                header("Refresh: 3; URL=prijava.php");
+                header("Refresh: 3; URL=index.php");
             } else {
                 $napaka = "Napaka pri vnosu v bazo.";
             }
@@ -72,7 +72,7 @@ if (isset($_POST['registergumb'])) {
         <b>Geslo:</b> <input type="password" name="geslo" required class="vnos" placeholder="Vnesi geslo" /><br />
         <div>
             <input type="submit" name="registergumb" value="Registracija" id="posljigumb" />
-            <a href="prijava.php"><button type="button" id="registergumb">Nazaj na prijavo?</button></a>
+            <a href="index.php"><button type="button" id="registergumb">Nazaj na prijavo?</button></a>
         </div>
     </form>
 </section>

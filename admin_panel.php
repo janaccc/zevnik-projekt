@@ -4,7 +4,7 @@ require_once 'povezava.php';
 
 // Preveri če je uporabnik prijavljen
 if (!isset($_SESSION['user'])) {
-    header("Location: prijava.php");
+    header("Location: index.php");
     exit();
 }
 
