@@ -22,6 +22,8 @@ if (isset($_POST['prijava'])) {
     if (empty($uporabnisko_ime) || empty($geslo)) {
         $napaka = "Vnesite uporabniško ime in geslo.";
     } else {
+
+        //statement zascita pred sql injection
         $statement = mysqli_prepare($conn, "SELECT id, password, vloga FROM uporabniki WHERE user = ?");
         mysqli_stmt_bind_param($statement, "s", $uporabnisko_ime);
         mysqli_stmt_execute($statement);
