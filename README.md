@@ -1,1 +1,1 @@
-Link do strani: 
+Link do strani: jantopler.wuaze.com 
