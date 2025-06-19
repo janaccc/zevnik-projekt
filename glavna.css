@@ -9,11 +9,8 @@ body {
 }
 
 #vsebina {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 40px;
     padding: 40px;
+    overflow: hidden;
 }
 
 #meni, #predvajalnik {
@@ -24,123 +21,94 @@ body {
     border-radius: 10px;
 }
 
-#predvajalnik{
+#predvajalnik {
     background-image: url(slike/ozadje-slika.jpg);
     background-size: cover;
+    width: 700px;
+    float: left;
 }
 
 #meni {
     width: 300px;
     background-color: floralwhite;
+    float: left;
 }
 
-#meniH1{
-    float:left;
+#meniH1 {
+    float: left;
 }
 
-#predvajalnik {
-    width: 700px;
+#odjava {
+    float: right;
 }
 
-#odjava{
-    float:right;
-}
-
-#pesmi{
+#pesmi {
     clear: both;
     margin-top: 20px;
 }
 
-#edit{
-    float:right;
-    margin-right: 50px;
-    background-color:yellow;
+#edit {
+    float: right;
+    margin-right: 20px;
+    background-color: yellow;
     outline: 1px solid gray;
     padding: 20px;
     border-radius: 10px;
 }
 
-#adminpanel{
+#adminpanel {
     text-decoration: none;
 }
 
-#dodaj_pesem{
+#dodaj_pesem, #uredi_pesem, #dodaj_izvajalca, #dodaj_album {
     background-color: floralwhite;
     outline: 1px solid gray;
     padding: 20px;
     border-radius: 10px;
     width: 700px;
-    margin:0 auto;
-    position: relative;
+    margin: 0 auto;
 }
 
-#uredi_pesem {
-    background-color: floralwhite;
-    outline: 1px solid gray;
-    padding: 20px;
-    border-radius: 10px;
-    width: 700px;
-    margin:0 auto;
-}
-
-#dodaj_izvajalca{
-        background-color: floralwhite;
-    outline: 1px solid gray;
-    padding: 20px;
-    border-radius: 10px;
-    width: 700px;
-    margin:0 auto;
-}
-
-#dodaj_album{
-    background-color: floralwhite;
-    outline: 1px solid gray;
-    padding: 20px;
-    border-radius: 10px;
-    width: 700px;
-    margin:0 auto;
-}
-
-#nazaj_gumb{
-    float:left;
+#nazaj_gumb {
+    float: left;
     background-color: floralwhite;
     outline: 1px solid gray;
     margin-left: 20px;
     border-radius: 10px;
     width: 100px;
     text-align: center;
-    margin-top:10px;
+    margin-top: 10px;
 }
 
-#nazajtext{
+#nazajtext {
     text-decoration: none;
 }
 
-#vsecki{
-        outline: 1px solid gray;
+#vsecki {
+    outline: 1px solid gray;
     padding: 20px;
     background-repeat: no-repeat;
     background-position: top right;
     border-radius: 10px;
     width: 300px;
     background-color: floralwhite;
-    position:absolute;
-    margin-top:500px;
+    position: absolute;
+    margin-top: 500px;
 }
 
 #like_gumb, .unlike_gumb {
-        border-radius: 12px;
+    border-radius: 12px;
     background: dodgerblue;
     text-align: center;
     height: 40px;
     line-height: 30px;
     width: 100px;
     cursor: pointer;
-    font-weight:bold;
+    font-weight: bold;
 }
 
-#footer {
-    margin-top: 40px;
+footer {
+    margin-top: auto;
     padding: 15px;
     background-color: #f0f0f0;
     text-align: center;
